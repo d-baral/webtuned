@@ -19,4 +19,4 @@ It contains following functionalities
 - Navigate to .env file in the project directory and enter newly created database name in DB_NAME
 
 ## Postman API COllection
-https://interstellar-crater-366399.postman.co/workspace/My-Workspace~bd8ca3cf-7c3a-4ea4-97f0-7030405dbc63/collection/28571311-372fbd8e-201c-457c-9fc3-6d1955155863?action=share&creator=28571311
+https://www.postman.com/interstellar-crater-366399/workspace/web-tuned/collection/28571311-372fbd8e-201c-457c-9fc3-6d1955155863?action=share&creator=28571311
