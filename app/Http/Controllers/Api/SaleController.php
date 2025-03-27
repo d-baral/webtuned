@@ -27,7 +27,21 @@ class SaleController extends BaseController
         }
 
         if ($date) {
-            $salesQuery->whereDate('sales_date', $date);
+            $timestamp = strtotime($date);
+
+            // Check if the date format contains only the year (YYYY)
+            if (preg_match('/^\d{4}$/', $date)) {
+                $salesQuery->whereYear('sales_date', $date);
+            }
+            // Check if the date format contains year and month (YYYY-MM)
+            elseif (preg_match('/^\d{4}-\d{2}$/', $date)) {
+                $salesQuery->whereYear('sales_date', date('Y', $timestamp))
+                    ->whereMonth('sales_date', date('m', $timestamp));
+            }
+            // Otherwise, assume a full date (YYYY-MM-DD) and filter by exact date
+            else {
+                $salesQuery->whereDate('sales_date', date('Y-m-d', $timestamp));
+            }
         }
 
         $sales = $salesQuery->paginate($perPage);
