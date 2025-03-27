@@ -16,18 +16,27 @@ class SaleController extends BaseController
      */
     public function index()
     {
-        if (request()->query('query')) {
-            $business_name = request()->query('query');
-            $sales = Sale::where('business_name', 'like', "%$business_name%")->paginate(request()->query('per_page') ?? 10);
-            if ($sales) {
-                return $this->sendResponse(SaleResource::collection($sales), 'Sales Data retrieved successful.');
-            } else {
-                return $this->sendError('No Data Found for ' . request()->query('query'));
-            }
+        $query = request()->query('query');
+        $date = request()->query('date');
+        $perPage = request()->query('per_page', 10);
+
+        $salesQuery = Sale::query();
+
+        if ($query) {
+            $salesQuery->whereRaw('LOWER(business_name) LIKE LOWER(?)', ["%{$query}%"]);
         }
 
-        $sales = Sale::paginate(request()->query('per_page') ?? 10);
-        return $this->sendResponse(SaleResource::collection($sales), 'Sales Data retrieved successful.');
+        if ($date) {
+            $salesQuery->whereDate('sales_date', $date);
+        }
+
+        $sales = $salesQuery->paginate($perPage);
+
+        if ($sales->isEmpty()) {
+            return $this->sendError('No Data Found.');
+        }
+
+        return $this->sendResponse(SaleResource::collection($sales), 'Sales Data retrieved successfully.');
     }
 
 
