@@ -18,6 +18,7 @@ class SaleController extends BaseController
     {
         $query = request()->query('query');
         $date = request()->query('date');
+        $sort_by = request()->query('sort_by','asc');
         $perPage = request()->query('per_page', 10);
 
         $salesQuery = Sale::query();
@@ -44,7 +45,7 @@ class SaleController extends BaseController
             }
         }
 
-        $sales = $salesQuery->paginate($perPage);
+        $sales = $salesQuery->orderBy('created_at',$sort_by)->paginate($perPage);
 
         if ($sales->isEmpty()) {
             return $this->sendError('No Data Found.');
@@ -59,13 +60,25 @@ class SaleController extends BaseController
      */
     public function store(Request $request)
     {
+
+        $sale = new Sale;
+
         $validator = $this->validateRequest($request);
         if ($validator->fails()) {
             return $this->sendError('Validation Error', $validator->errors());
         }
 
-        $sales = Sale::create($request->all());
-        return $this->sendResponse($sales, 'Sale Record Created Successful!');
+        if ($request->hasFile('file_upload')) {
+            $filename = $request->file('file_upload')->getClientOriginalName();
+            $getfilenamewitoutext = pathinfo($filename, PATHINFO_FILENAME);
+            $getfileExtension = $request->file('file_upload')->getClientOriginalExtension();
+            $createnewFileName = time() . '_' . str_replace(' ', '_', $getfilenamewitoutext) . '.' . $getfileExtension;
+            $file_path = $request->file('file_upload')->storeAs('file', $createnewFileName);
+            $request->request->add(['file' => 'storage/'.$file_path]);
+        }
+
+        $sales = $sale->create($request->all());
+        return $this->sendResponse(new SaleResource($sales), 'Sale Record Created Successful!');
     }
 
     /**
@@ -75,7 +88,7 @@ class SaleController extends BaseController
     {
         $sales = Sale::find($id);
         if ($sales) {
-            return $this->sendResponse($sales, 'Sale Record Fetched Successful!');
+            return $this->sendResponse(new SaleResource($sales), 'Sale Record Fetched Successful!');
         } else {
             return $this->sendError('Sale Record Not Found!');
         }
@@ -98,7 +111,7 @@ class SaleController extends BaseController
         } else {
             return $this->sendError('Sale Record Not Found!');
         }
-        return $this->sendResponse($sales, 'Sale Record Created Successful!');
+        return $this->sendResponse(new SaleResource($sales), 'Sale Record Created Successful!');
     }
 
     /**
