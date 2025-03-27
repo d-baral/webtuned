@@ -86,7 +86,6 @@ class SaleController extends BaseController
      */
     public function update(Request $request, string $id)
     {
-        dd($request);
         $validator = $this->validateRequest($request);
         if ($validator->fails()) {
             return $this->sendError('Validation Error', $validator->errors());
