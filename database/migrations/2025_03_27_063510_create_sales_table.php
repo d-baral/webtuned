@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('sales', function (Blueprint $table) {
             $table->id();
+            $table->string('business_name');
+            $table->string('services')->nullable();
+            $table->decimal('paid_amount', 8, 2)->nullable();
+            $table->string('due_amount', 8, 2)->nullable();
+            $table->string('sales_date')->nullable();
+            $table->text('remarks')->nullable();
+            $table->string('file')->nullable();
             $table->timestamps();
         });
     }
